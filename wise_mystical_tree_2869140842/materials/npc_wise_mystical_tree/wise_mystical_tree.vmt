@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture" "npc_wise_mystical_tree/wise_mystical_tree"
+	"$alphatest" 1
+}

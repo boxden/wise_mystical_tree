@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "npc_wise_mystical_tree/wise_mystical_tree"
+	"$translucent" 1
+	"$vertexalpha" 1
+}
