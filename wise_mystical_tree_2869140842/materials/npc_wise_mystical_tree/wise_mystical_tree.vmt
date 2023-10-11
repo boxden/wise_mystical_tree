@@ -1,5 +1,6 @@
-"UnlitGeneric"
+UnlitGeneric // Last used :UnlitGeneric, VertexLitGeneric, LightmappedGeneric
 {
-	"$basetexture" "npc_wise_mystical_tree/wise_mystical_tree"
-	"$alphatest" 1
+	$basetexture npc_wise_mystical_tree/wise_mystical_tree //Repository
+	$selfillum 1 //Full bright
+
 }

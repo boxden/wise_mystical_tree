@@ -1,3 +1,5 @@
+// Last edited 12 OCT 2022 by steamcommunity.com/profiles/76561198115550963
+
 AddCSLuaFile()
 
 ENT.Base = "base_nextbot"
@@ -11,8 +13,10 @@ ENT.TauntSounds = 	{	Sound("npc_wise_mystical_tree/~"),
 						Sound("npc_wise_mystical_tree/~")
 					}
 local chaseMusic = Sound("npc_wise_mystical_tree/wise music.wav")
+local findMusic = Sound("npc_wise_mystical_tree/wise music low.wav")
 
 local workshopID = "2869140842"
+local SPRITE_SIZE = 128 //default 128 units, 512x512px size photo
 local IsValid = IsValid
 
 -- SERVER --
@@ -730,7 +734,7 @@ else -- CLIENT --
     local npc_wise_mystical_tree_music_volume = CreateConVar("npc_wise_mystical_tree_music_volume", 1, bit.bor(FCVAR_DEMO, FCVAR_ARCHIVE), "Maximum music volume when being chased by wise_mystical_tree. (0-1, where 0 is muted)")
     -- If another wise mystical tree comes in range before this delay is up,
     -- the music will continue where it left off.
-    local MUSIC_RESTART_DELAY = 2
+    local MUSIC_RESTART_DELAY = 300
     -- Beyond this distance, wise mystical trees do not count to music volume.
     local MUSIC_CUTOFF_DISTANCE = 5000 -- default "1000"
     -- Max volume is achieved when MUSIC_wise_mystical_tree_PANIC_COUNT wise mystical trees are this close,
@@ -817,8 +821,6 @@ else -- CLIENT --
             DevPrint(4, "Beginning music timer.")
         end
     end
-
-    local SPRITE_SIZE = 128
 
     function ENT:Initialize()
         self:SetRenderBounds(Vector(-SPRITE_SIZE / 2, -SPRITE_SIZE / 2, 0), Vector(SPRITE_SIZE / 2, SPRITE_SIZE / 2, SPRITE_SIZE), Vector(5, 5, 5))
@@ -960,6 +962,6 @@ end
 list.Set("NPC", "npc_wise_mystical_tree", {
     Name = "Wise Mystical Tree",
     Class = "npc_wise_mystical_tree",
-    Category = "Web_Artur Nextbots",
-    AdminOnly = true
+    Category = "Wise Mystical Tree Nextbot",
+    AdminOnly = false
 })
