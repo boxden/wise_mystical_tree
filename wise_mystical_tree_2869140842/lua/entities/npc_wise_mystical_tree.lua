@@ -1,40 +1,34 @@
 AddCSLuaFile()
+
 ENT.Base = "base_nextbot"
 ENT.PhysgunDisabled = true
 ENT.AutomaticFrameAdvance = false
+
 ENT.JumpSound = Sound("npc_wise_mystical_tree/~")
 ENT.JumpHighSound = Sound("npc_wise_mystical_tree/~")
-
-ENT.TauntSounds = { Sound("npc_wise_mystical_tree/~")}
-
+ENT.TauntSounds = 	{	Sound("npc_wise_mystical_tree/~"), 
+						Sound("npc_wise_mystical_tree/~"),
+						Sound("npc_wise_mystical_tree/~")
+					}
 local chaseMusic = Sound("npc_wise_mystical_tree/wise music.wav")
-local workshopID = "174117071"
+
+local workshopID = "2869140842"
 local IsValid = IsValid
 
 -- SERVER --
 if SERVER then
-    local npc_wise_mystical_tree_acquire_distance = CreateConVar("npc_wise_mystical_tree_acquire_distance", 25000, FCVAR_NONE, "The maximum distance at which wise_mystical_tree will chase a target.") -- standard "2500"
-    local npc_wise_mystical_tree_spawn_protect = CreateConVar("npc_wise_mystical_tree_spawn_protect", 1, FCVAR_NONE, "If set to 1, wise_mystical_tree will not target players or hide within 200 units of \z
-	a spawn point.")
-    local npc_wise_mystical_tree_attack_distance = CreateConVar("npc_wise_mystical_tree_attack_distance", 80, FCVAR_NONE, "The reach of wise_mystical_tree's attack.") --standard 80
+    local npc_wise_mystical_tree_acquire_distance = CreateConVar("npc_wise_mystical_tree_acquire_distance", 25000, FCVAR_NONE, "The maximum distance at which wise_mystical_tree will chase a target.") -- default "2500"
+    local npc_wise_mystical_tree_spawn_protect = CreateConVar("npc_wise_mystical_tree_spawn_protect", 1, FCVAR_NONE, "If set to 1, wise_mystical_tree will not target players or hide within 200 units of \z a spawn point.")
+    local npc_wise_mystical_tree_attack_distance = CreateConVar("npc_wise_mystical_tree_attack_distance", 80, FCVAR_NONE, "The reach of wise_mystical_tree's attack.") -- default 80
     local npc_wise_mystical_tree_attack_interval = CreateConVar("npc_wise_mystical_tree_attack_interval", 0.2, FCVAR_NONE, "The delay between wise_mystical_tree's attacks.")
-    local npc_wise_mystical_tree_attack_force = CreateConVar("npc_wise_mystical_tree_attack_force", 800, FCVAR_NONE, "The physical force of wise_mystical_tree's attack. Higher values throw things \z
-	farther.") -- standard "800"
+    local npc_wise_mystical_tree_attack_force = CreateConVar("npc_wise_mystical_tree_attack_force", 800, FCVAR_NONE, "The physical force of wise_mystical_tree's attack. Higher values throw things \z farther.") -- default "800"
     local npc_wise_mystical_tree_smash_props = CreateConVar("npc_wise_mystical_tree_smash_props", 1, FCVAR_NONE, "If set to 1, wise_mystical_tree will punch through any props placed in their way.")
     local npc_wise_mystical_tree_allow_jump = CreateConVar("npc_wise_mystical_tree_allow_jump", 1, FCVAR_NONE, "If set to 1, wise_mystical_tree will be able to jump.")
-    local npc_wise_mystical_tree_hiding_scan_interval = CreateConVar("npc_wise_mystical_tree_hiding_scan_interval", 3, FCVAR_NONE, "wise_mystical_tree will only seek out hiding places every X seconds. This can be an \z
-	expensive operation, so it is not recommended to lower this too much. \z
-	However, if distant wise_mystical_trees are not hiding from you quickly enough, you \z
-	may consider lowering this a small amount.")
+    local npc_wise_mystical_tree_hiding_scan_interval = CreateConVar("npc_wise_mystical_tree_hiding_scan_interval", 3, FCVAR_NONE, "wise_mystical_tree will only seek out hiding places every X seconds. This can be an \z expensive operation, so it is not recommended to lower this too much. \z However, if distant wise_mystical_trees are not hiding from you quickly enough, you \z may consider lowering this a small amount.")
     local npc_wise_mystical_tree_hiding_repath_interval = CreateConVar("npc_wise_mystical_tree_hiding_repath_interval", 1, FCVAR_NONE, "The path to wise_mystical_tree's hiding spot will be redetermined every X seconds.")
-    local npc_wise_mystical_tree_chase_repath_interval = CreateConVar("npc_wise_mystical_tree_chase_repath_interval", 0.1, FCVAR_NONE, "The path to and position of wise_mystical_tree's target will be redetermined every \z
-	X seconds.")
-    local npc_wise_mystical_tree_expensive_scan_interval = CreateConVar("npc_wise_mystical_tree_expensive_scan_interval", 1, FCVAR_NONE, "Slightly expensive operations (distance calculations and entity \z
-	searching) will occur every X seconds.")
-    local npc_wise_mystical_tree_force_download = CreateConVar("npc_wise_mystical_tree_force_download", 1, FCVAR_ARCHIVE, "If set to 1, clients will be forced to download wise_mystical_tree resources \z
-	(restart required after changing).\n\z
-	WARNING: If this option is disabled, clients will be unable to see or \z
-	hear wise_mystical_tree!")
+    local npc_wise_mystical_tree_chase_repath_interval = CreateConVar("npc_wise_mystical_tree_chase_repath_interval", 0.1, FCVAR_NONE, "The path to and position of wise_mystical_tree's target will be redetermined every \z X seconds.")
+    local npc_wise_mystical_tree_expensive_scan_interval = CreateConVar("npc_wise_mystical_tree_expensive_scan_interval", 1, FCVAR_NONE, "Slightly expensive operations (distance calculations and entity \z searching) will occur every X seconds.")
+    local npc_wise_mystical_tree_force_download = CreateConVar("npc_wise_mystical_tree_force_download", 1, FCVAR_ARCHIVE, "If set to 1, clients will be forced to download wise_mystical_tree resources \z (restart required after changing).\n\z WARNING: If this option is disabled, clients will be unable to see or \z hear wise_mystical_tree!")
     -- So we don't spam voice TOO much.
     local TAUNT_INTERVAL = 1.2
     local PATH_INFRACTION_TIMEOUT = 5
@@ -155,29 +149,65 @@ if SERVER then
         RunConsoleCommand("developer", "0")
     end
 
-    local DEFAULT_SEEDCLASSES = {"info_player_start", "gmod_player_start", "info_spawnpoint", "info_player_combine", "info_player_rebel", "info_player_deathmatch", "info_player_counterterrorist", "info_player_terrorist", "info_player_allies", "info_player_axis", "info_player_teamspawn", "info_survivor_position", "info_coop_spawn", "aoc_spawnpoint", "diprip_start_team_red", "diprip_start_team_blue", "dys_spawn_point", "ins_spawnpoint", "info_player_pirate", "info_player_viking", "info_player_knight", "info_player_red", "info_player_blue", "info_player_coop", "info_player_zombiemaster", "info_player_human", "info_player_zombie", "info_teleport_destination",}
-
-    -- Source games in general
-    -- Garry's Mod (Obsolete)
-    -- Half-Life 2: Deathmatch
-    -- Counter-Strike (Source & Global Offensive)
-    -- Day of Defeat: Source
-    -- Team Fortress 2
-    -- Left 4 Dead (1 & 2)
-    -- Portal 2
-    -- Age of Chivalry
-    -- D.I.P.R.I.P. Warm Up
-    -- Dystopia
-    -- Insurgency
-    -- Pirates, Vikings, and Knights II
-    -- Obsidian Conflict (and probably some generic CTF)
-    -- Synergy
-    -- Zombie Master
-    -- Zombie Panic: Source
-    -- Some maps start you in a cage room with a start button, have building
-    -- interiors with teleportation doors, or the like.
-    -- This is so the navmesh will (hopefully) still generate correctly and
-    -- fully in these cases.
+	local DEFAULT_SEEDCLASSES = {
+		-- Source games in general
+		"info_player_start",
+	
+		-- Garry's Mod (Obsolete)
+		"gmod_player_start", "info_spawnpoint",
+	
+		-- Half-Life 2: Deathmatch
+		"info_player_combine", "info_player_rebel", "info_player_deathmatch",
+	
+		-- Counter-Strike (Source & Global Offensive)
+		"info_player_counterterrorist", "info_player_terrorist",
+	
+		-- Day of Defeat: Source
+		"info_player_allies", "info_player_axis",
+	
+		-- Team Fortress 2
+		"info_player_teamspawn",
+	
+		-- Left 4 Dead (1 & 2)
+		"info_survivor_position",
+	
+		-- Portal 2
+		"info_coop_spawn",
+	
+		-- Age of Chivalry
+		"aoc_spawnpoint",
+	
+		-- D.I.P.R.I.P. Warm Up
+		"diprip_start_team_red", "diprip_start_team_blue",
+	
+		-- Dystopia
+		"dys_spawn_point",
+	
+		-- Insurgency
+		"ins_spawnpoint",
+	
+		-- Pirates, Vikings, and Knights II
+		"info_player_pirate", "info_player_viking", "info_player_knight",
+	
+		-- Obsidian Conflict (and probably some generic CTF)
+		"info_player_red", "info_player_blue",
+	
+		-- Synergy
+		"info_player_coop",
+	
+		-- Zombie Master
+		"info_player_zombiemaster",
+	
+		-- Zombie Panic: Source
+		"info_player_human", "info_player_zombie",
+	
+		-- Some maps start you in a cage room with a start button, have building
+		-- interiors with teleportation doors, or the like.
+		-- This is so the navmesh will (hopefully) still generate correctly and
+		-- fully in these cases.
+		"info_teleport_destination",
+	}
+	
     local function addEntitiesToSet(set, ents)
         for _, ent in pairs(ents) do
             if IsValid(ent) then
@@ -683,7 +713,7 @@ if SERVER then
 else -- CLIENT --
     local MAT_wise_mystical_tree = Material("npc_wise_mystical_tree/wise_mystical_tree")
     killicon.Add("npc_wise_mystical_tree", "npc_wise_mystical_tree/killicon", color_white)
-    language.Add("npc_wise_mystical_tree", "Wise Mystical Tree")
+    language.Add("npc_wise_mystical_tree", "Wise Mystical Tree") -- murderer's name
     ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
     local developer = GetConVar("developer")
 
@@ -694,17 +724,18 @@ else -- CLIENT --
     end
 
     local panicMusic = nil
-    local lastPanic = 0 -- The last time we were in music range of a wise mystical tree.
+    local lastPanic = 0 
+	-- The last time we were in music range of a wise mystical tree.
     --TODO: Why don't these flags show up? Bug? Documentation would be lovely.
     local npc_wise_mystical_tree_music_volume = CreateConVar("npc_wise_mystical_tree_music_volume", 1, bit.bor(FCVAR_DEMO, FCVAR_ARCHIVE), "Maximum music volume when being chased by wise_mystical_tree. (0-1, where 0 is muted)")
     -- If another wise mystical tree comes in range before this delay is up,
     -- the music will continue where it left off.
     local MUSIC_RESTART_DELAY = 2
     -- Beyond this distance, wise mystical trees do not count to music volume.
-    local MUSIC_CUTOFF_DISTANCE = 1000
+    local MUSIC_CUTOFF_DISTANCE = 5000 -- default "1000"
     -- Max volume is achieved when MUSIC_wise_mystical_tree_PANIC_COUNT wise mystical trees are this close,
     -- or an equivalent score.
-    local MUSIC_PANIC_DISTANCE = 200
+    local MUSIC_PANIC_DISTANCE = 5000 -- default 200
     -- That's a lot of wise mystical tree.
     local MUSIC_wise_mystical_tree_PANIC_COUNT = 8
     local MUSIC_wise_mystical_tree_MAX_DISTANCE_SCORE = (MUSIC_CUTOFF_DISTANCE - MUSIC_PANIC_DISTANCE) * MUSIC_wise_mystical_tree_PANIC_COUNT
